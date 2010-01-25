@@ -3,11 +3,16 @@
 <head>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script> 
 <script>
+$(document).ready(function(){
 if ("WebSocket" in window) {
   var ws = new WebSocket("ws://aimee-pc:5555/");
-  //setInterval(function(){ alert(ws.readyState) }, 1000)
   ws.onopen = function() {
-    alert("success")
+    $('#wait').html("you can type and hit enter. look at your console.")
+    $('#form').submit(function(){
+        ws.send($('#message').val())
+        $('#message').val('')
+        return false;
+    })
     ws.send("message to send");
   };
   ws.onmessage = function (evt) { 
@@ -20,16 +25,11 @@ if ("WebSocket" in window) {
 } else {
   alert("No web socket support"); //flash alternative ?
 }
-$(document).ready(function(){
-    $('#form').submit(function(){
-        ws.send($('#message').val())
-        $('#message').val('')
-        return false;
-    })
 })
 </script>
 </head>
 <body>
+<div id="wait">Waiting...</div>
 Web socket
 <form id="form" action="http://www.google.com">
 <input id="message">

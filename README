@@ -1,0 +1,7 @@
+An extremely simple implementation of a websocket server
+
+handler.py is where you handle sent data
+
+tick.py is where you put the code that you want to happen on each tick.
+
+Examples to come
