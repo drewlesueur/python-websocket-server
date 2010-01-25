@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script> 
+<script>
+if ("WebSocket" in window) {
+  var ws = new WebSocket("ws://aimee-pc:5555/");
+  //setInterval(function(){ alert(ws.readyState) }, 1000)
+  ws.onopen = function() {
+    alert("success")
+    ws.send("message to send");
+  };
+  ws.onmessage = function (evt) { 
+    var m = evt.data;
+    console.log(m)
+  };
+  ws.onclose = function() { 
+    alert("closed")
+  };
+} else {
+  alert("No web socket support"); //flash alternative ?
+}
+$(document).ready(function(){
+    $('#form').submit(function(){
+        ws.send($('#message').val())
+        $('#message').val('')
+        return false;
+    })
+})
+</script>
+</head>
+<body>
+Web socket
+<form id="form" action="http://www.google.com">
+<input id="message">
+</form>
+</body>
+</html>
