@@ -3,9 +3,14 @@ import select
 import time
 import handler
 import tick
-cycles_per_tick = 5000
+
+cycles_per_tick = 500
 port = 5555
-hostname = socket.gethostname() #"127.0.0.1" #"192.168.1.104"
+hostname = hostname = socket.gethostname() #"127.0.0.1" #"192.168.1.104"
+
+
+
+
 hostname = hostname.lower() #important
 websocket_location = "/"
 scope = {}
@@ -87,9 +92,7 @@ while True:
                 handle_data(data, socko, to_read, to_write, to_error)
             except socket.error, msg:
                 closesocket(socko)
+        if counter % cycles_per_tick == 0:
+            tick.tick(socko, to_read, to_write, to_error, scope)
         for socko in to_error:
-            print socko + " had an error"
-        for socko in to_write:
-            if counter % cycles_per_tick == 0:
-                print "tick"
-                tick.tick(socko,scope)
+            print socko + " had an error"            

@@ -17,7 +17,7 @@ if ("WebSocket" in window) {
   };
   ws.onmessage = function (evt) { 
     var m = evt.data;
-    console.log(m)
+    $('#message').after("<div class='message'>"+m+"</div>")
   };
   ws.onclose = function() { 
     alert("closed")
