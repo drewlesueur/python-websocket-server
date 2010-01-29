@@ -1,7 +1,7 @@
 import util
 import time
 
-def tick(socko, to_read, to_write, to_error, scope):
+def tick(to_read, to_write, to_error, scope):
     #do something
     print "tick"
     for socko in to_write:

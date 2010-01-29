@@ -3,16 +3,22 @@ import select
 import time
 import handler
 import tick
+import settings
 
-cycles_per_tick = 500
-port = 5555
-hostname = hostname = socket.gethostname() #"127.0.0.1" #"192.168.1.104"
+cycles_per_tick = settings.cycles_per_tick
+port = settings.port
+hostname = settings.hostname
+websocket_location = settings.websocket_location
+#'192.168.56.1'
+#'68.98.117.248' 
+#socket.gethostname() 
+#"127.0.0.1" 
+#"192.168.1.104"
 
 
 
 
 hostname = hostname.lower() #important
-websocket_location = "/"
 scope = {}
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serversocket.bind((hostname, port)) #this is the one you want
@@ -35,6 +41,7 @@ def handle_data(data, socko, to_read, to_write, to_error):
     elif data[0:14] == "GET / HTTP/1.1": #normal http
         file = open("index.html", "r")
         contents = file.read()
+        contents =  contents.replace("ws://host_here:port_here/", "ws://" + hnp + websocket_location )
         print "normal http"
         socko.send("HTTP/1.1 200 OK\r\n" 
         "Connection: close\r\n" +
@@ -56,7 +63,7 @@ def handle_data(data, socko, to_read, to_write, to_error):
         print data
         for i in data:
             print ord(i)
-connections = []
+connections = [serversocket]
 conn_info = [];
 counter = 0;
 def closesocket(socko):
@@ -66,18 +73,18 @@ def closesocket(socko):
 while True:
     counter = counter + 1
     time.sleep(.001) #change this in the future for speed
-    ready_to_read, ready_to_write, in_error = select.select([serversocket],[],[],0) #should I change that 0 to .001
-    for sock in ready_to_read:
-        print "test"		
-        (clientsocket, address) = sock.accept()
-        print "putting " + address[0] + " onto connections";
-        conn_info.append(address)
-        clientsocket.setblocking(0)
-        connections.append(clientsocket)
-        print len(connections)
-    if len(connections) > 0:
-        to_read, to_write, to_error = select.select(connections,connections,connections,0)
-        for socko in to_read:
+    to_read, to_write, to_error = select.select(connections,connections,connections,0)
+    for socko in to_read:
+        if socko == serversocket:
+            print "connecting"		
+            (clientsocket, address) = socko.accept()
+            print "putting " + address[0] + " onto connections";
+            conn_info.append(address)
+            clientsocket.setblocking(0)
+            connections.append(clientsocket)
+            print len(connections)
+        else:
+            print "reader"
             try:  #i needed this try block only for google chrome! wierd.
                 data = socko.recv(1024) #1024 potential problem causer
             except socket.error, msg:
@@ -92,7 +99,8 @@ while True:
                 handle_data(data, socko, to_read, to_write, to_error)
             except socket.error, msg:
                 closesocket(socko)
-        if counter % cycles_per_tick == 0:
-            tick.tick(socko, to_read, to_write, to_error, scope)
-        for socko in to_error:
-            print socko + " had an error"            
+    if counter % cycles_per_tick == 0:
+        print connections
+        tick.tick(to_read, to_write, to_error, scope)
+    for socko in to_error:
+        print socko + " had an error"            

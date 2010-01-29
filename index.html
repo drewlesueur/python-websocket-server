@@ -5,7 +5,7 @@
 <script>
 $(document).ready(function(){
 if ("WebSocket" in window) {
-  var ws = new WebSocket("ws://aimee-pc:5555/");
+  var ws = new WebSocket("ws://host_here:port_here/");
   ws.onopen = function() {
     $('#wait').html("you can type and hit enter. look at your console.")
     $('#form').submit(function(){
